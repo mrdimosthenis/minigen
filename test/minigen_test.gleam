@@ -60,3 +60,35 @@ pub fn boolean_test() {
   |> minigen.run_with_seed(999)
   |> should.equal(True)
 }
+
+pub fn list_test() {
+  minigen.boolean()
+  |> minigen.list(4)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([False, False, True, False])
+
+  minigen.float()
+  |> minigen.list(3)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+
+  minigen.integer(10)
+  |> minigen.list(5)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([2, 9, 5, 4, 7])
+
+  minigen.integer(10)
+  |> minigen.list(5)
+  |> minigen.run_with_seed(999)
+  |> should.equal([5, 7, 3, 1, 4])
+
+  minigen.integer(5)
+  |> minigen.list(0)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([])
+
+  minigen.integer(5)
+  |> minigen.list(1)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([3])
+}

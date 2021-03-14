@@ -2,6 +2,7 @@ import gleam/float
 import gleam/int
 import gleam/list
 import gleam/pair
+import gleam_zlists as zlist
 import minigen/interop
 
 pub type Seed =
@@ -165,27 +166,26 @@ pub fn boolean() -> Generator(Bool) {
   |> map(fn(x) { x <. 0.5 })
 }
 
-fn list_help(
-  gen: Generator(a),
-  seed: Seed,
-  rev_list: List(a),
-  n: Int,
-) -> tuple(Seed, List(a)) {
-  case n < 1 {
-    True -> tuple(seed, rev_list)
-    False -> {
-      let Generator(f) = gen
-      let tuple(next_seed, value) = f(seed)
-      list_help(gen, next_seed, list.append([value], rev_list), n - 1)
+pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
+  let Generator(f) = gen
+  let new_f = fn(seed_0) {
+    case n > 0 {
+      True -> {
+        let Ok(res) =
+          zlist.iterate(
+            tuple(seed_0, []),
+            fn(t) {
+              let tuple(seed, ls) = t
+              let tuple(next_seed, elem) = f(seed)
+              let next_ls = list.append([elem], ls)
+              tuple(next_seed, next_ls)
+            },
+          )
+          |> zlist.fetch(n)
+        res
+      }
+      False -> tuple(seed_0, [])
     }
   }
-}
-
-pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
-  let new_f = fn(seed) { list_help(gen, seed, list.new(), n) }
   Generator(new_f)
-}
-
-pub fn pair(gen_a: Generator(a), gen_b: Generator(b)) -> Generator(tuple(a, b)) {
-  map2(gen_a, gen_b, fn(a, b) { tuple(a, b) })
 }
