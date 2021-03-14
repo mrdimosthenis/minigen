@@ -189,3 +189,13 @@ pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
   }
   Generator(new_f)
 }
+
+pub fn element_of_list(gen: Generator(List(a))) -> Generator(Result(a, Nil)) {
+  let fun = fn(ls) {
+    ls
+    |> list.length
+    |> integer
+    |> map(fn(n) { list.at(ls, n) })
+  }
+  then(gen, fun)
+}

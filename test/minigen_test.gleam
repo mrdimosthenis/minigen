@@ -92,3 +92,45 @@ pub fn list_test() {
   |> minigen.run_with_seed(1000)
   |> should.equal([3])
 }
+
+pub fn element_of_list_test() {
+  minigen.always([False, False, True, False])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal(Ok(True))
+
+  minigen.always([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal(Ok(0.7109364198110805))
+
+  minigen.always([2, 9, 5, 4, 7])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal(Ok(4))
+
+  minigen.always([2, 9, 5, 4, 7])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(999)
+  |> should.equal(Ok(5))
+
+  minigen.always([6])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal(Ok(6))
+
+  minigen.always([6])
+  |> minigen.element_of_list
+  |> minigen.run()
+  |> should.equal(Ok(6))
+
+  minigen.always([])
+  |> minigen.element_of_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal(Error(Nil))
+
+  minigen.always([])
+  |> minigen.element_of_list
+  |> minigen.run()
+  |> should.equal(Error(Nil))
+}
