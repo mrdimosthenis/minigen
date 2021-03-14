@@ -199,3 +199,34 @@ pub fn element_of_list(gen: Generator(List(a))) -> Generator(Result(a, Nil)) {
   }
   then(gen, fun)
 }
+
+pub fn shuffled_list(gen: Generator(List(a))) -> Generator(List(a)) {
+  let move_to_edge = fn(ls) {
+    case ls {
+      [] -> always([])
+      [x] -> always([x])
+      _ ->
+        ls
+        |> list.length
+        |> integer
+        |> map2(
+          boolean(),
+          fn(i, b) {
+            let tuple(before, rest) = list.split(ls, i)
+            let tuple(elem, after) = list.split(rest, 1)
+            case b {
+              True -> list.flatten([elem, before, after])
+              False -> list.flatten([before, after, elem])
+            }
+          },
+        )
+    }
+  }
+
+  let fun = fn(ls) {
+    let init_acc = always(ls)
+    list.fold(ls, init_acc, fn(_, acc) { then(acc, move_to_edge) })
+  }
+
+  then(gen, fun)
+}

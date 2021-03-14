@@ -134,3 +134,50 @@ pub fn element_of_list_test() {
   |> minigen.run()
   |> should.equal(Error(Nil))
 }
+
+pub fn shuffled_list_test() {
+  minigen.always([False, False, True, False])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal([True, False, False, False])
+
+  minigen.always([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal([0.7109364198110805, 0.47372875562526207, 0.5348931595479329])
+
+  minigen.always([2, 9, 5, 4, 7])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal([5, 2, 4, 7, 9])
+
+  minigen.always([2, 9, 5, 4, 7])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(999)
+  |> should.equal([9, 5, 7, 2, 4])
+
+  minigen.always([2, 9, 5, 4, 7])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(998)
+  |> should.equal([2, 4, 9, 7, 5])
+
+  minigen.always([6])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal([6])
+
+  minigen.always([6])
+  |> minigen.shuffled_list
+  |> minigen.run()
+  |> should.equal([6])
+
+  minigen.always([])
+  |> minigen.shuffled_list
+  |> minigen.run_with_seed(1000)
+  |> should.equal([])
+
+  minigen.always([])
+  |> minigen.shuffled_list
+  |> minigen.run()
+  |> should.equal([])
+}
