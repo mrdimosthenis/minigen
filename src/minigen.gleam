@@ -1,4 +1,7 @@
+import gleam/float
+import gleam/int
 import gleam/list
+import gleam/pair
 import minigen/interop
 
 pub type Seed =
@@ -23,21 +26,26 @@ fn uniform(seed: Seed) -> tuple(Seed, Float) {
   tuple(next_seed, x)
 }
 
+pub fn run(gen: Generator(a)) -> a {
+  let Generator(f) = gen
+  random_seed()
+  |> f
+  |> pair.second
+}
+
+pub fn run_with_seed(gen: Generator(a), i: Int) -> a {
+  let Generator(f) = gen
+  i
+  |> fixed_seed
+  |> f
+  |> pair.second
+}
+
 pub fn map(gen: Generator(a), fun: fn(a) -> b) -> Generator(b) {
   let Generator(f) = gen
   let new_f = fn(seed_0) {
     let tuple(seed_1, a) = f(seed_0)
     tuple(seed_1, fun(a))
-  }
-  Generator(new_f)
-}
-
-pub fn then(gen: Generator(a), fun: fn(a) -> Generator(b)) -> Generator(b) {
-  let Generator(f) = gen
-  let new_f = fn(seed_0) {
-    let tuple(seed_1, a) = f(seed_0)
-    let Generator(g) = fun(a)
-    g(seed_1)
   }
   Generator(new_f)
 }
@@ -120,13 +128,41 @@ pub fn map5(
   Generator(f)
 }
 
-pub fn pair(gen_a: Generator(a), gen_b: Generator(b)) -> Generator(tuple(a, b)) {
-  map2(gen_a, gen_b, fn(a, b) { tuple(a, b) })
+pub fn then(gen: Generator(a), fun: fn(a) -> Generator(b)) -> Generator(b) {
+  let Generator(f) = gen
+  let new_f = fn(seed_0) {
+    let tuple(seed_1, a) = f(seed_0)
+    let Generator(g) = fun(a)
+    g(seed_1)
+  }
+  Generator(new_f)
 }
 
-pub fn constant(x: a) -> Generator(a) {
+pub fn always(x: a) -> Generator(a) {
   let f = fn(seed) { tuple(seed, x) }
   Generator(f)
+}
+
+pub fn float() -> Generator(Float) {
+  let f = fn(seed_0) {
+    let tuple(seed_1, x) = uniform(seed_0)
+    tuple(seed_1, x)
+  }
+  Generator(f)
+}
+
+pub fn integer(n: Int) -> Generator(Int) {
+  float()
+  |> map(fn(x) {
+    x *. int.to_float(n)
+    |> float.floor
+    |> float.round
+  })
+}
+
+pub fn boolean() -> Generator(Bool) {
+  float()
+  |> map(fn(x) { x <. 0.5 })
 }
 
 fn list_help(
@@ -148,4 +184,8 @@ fn list_help(
 pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
   let new_f = fn(seed) { list_help(gen, seed, list.new(), n) }
   Generator(new_f)
+}
+
+pub fn pair(gen_a: Generator(a), gen_b: Generator(b)) -> Generator(tuple(a, b)) {
+  map2(gen_a, gen_b, fn(a, b) { tuple(a, b) })
 }
