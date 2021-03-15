@@ -206,17 +206,20 @@ pub fn shuffled_list(gen: Generator(List(a))) -> Generator(List(a)) {
       [] -> always([])
       [x] -> always([x])
       _ ->
-        ls
-        |> list.length
+        list.length(ls) - 1
         |> integer
         |> map2(
-          boolean(),
-          fn(i, b) {
-            let tuple(before, rest) = list.split(ls, i)
+          integer(6),
+          fn(i, cs) {
+            let tuple(before, rest) = list.split(ls, i + 1)
             let tuple(elem, after) = list.split(rest, 1)
-            case b {
-              True -> list.flatten([elem, before, after])
-              False -> list.flatten([before, after, elem])
+            case cs {
+              0 -> list.flatten([elem, before, after])
+              1 -> list.flatten([elem, after, before])
+              2 -> list.flatten([before, elem, after])
+              3 -> list.flatten([before, after, elem])
+              4 -> list.flatten([after, elem, before])
+              5 -> list.flatten([after, before, elem])
             }
           },
         )
