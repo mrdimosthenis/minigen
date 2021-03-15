@@ -166,6 +166,42 @@ pub fn boolean() -> Generator(Bool) {
   |> map(fn(x) { x <. 0.5 })
 }
 
+pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
+  ls
+  |> list.length
+  |> integer
+  |> map(fn(n) { list.at(ls, n) })
+}
+
+pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
+  let move_to_edge = fn(acc_ls) {
+    case acc_ls {
+      [] -> always([])
+      [x] -> always([x])
+      _ ->
+        list.length(acc_ls) - 1
+        |> integer
+        |> map2(
+          integer(6),
+          fn(i, cs) {
+            let tuple(before, rest) = list.split(acc_ls, i + 1)
+            let tuple(elem, after) = list.split(rest, 1)
+            case cs {
+              0 -> list.flatten([elem, before, after])
+              1 -> list.flatten([elem, after, before])
+              2 -> list.flatten([before, elem, after])
+              3 -> list.flatten([before, after, elem])
+              4 -> list.flatten([after, elem, before])
+              5 -> list.flatten([after, before, elem])
+            }
+          },
+        )
+    }
+  }
+
+  list.fold(ls, always(ls), fn(_, acc) { then(acc, move_to_edge) })
+}
+
 pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
   let Generator(f) = gen
   let new_f = fn(seed_0) {
@@ -188,48 +224,4 @@ pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
     }
   }
   Generator(new_f)
-}
-
-pub fn element_of_list(gen: Generator(List(a))) -> Generator(Result(a, Nil)) {
-  let fun = fn(ls) {
-    ls
-    |> list.length
-    |> integer
-    |> map(fn(n) { list.at(ls, n) })
-  }
-  then(gen, fun)
-}
-
-pub fn shuffled_list(gen: Generator(List(a))) -> Generator(List(a)) {
-  let move_to_edge = fn(ls) {
-    case ls {
-      [] -> always([])
-      [x] -> always([x])
-      _ ->
-        list.length(ls) - 1
-        |> integer
-        |> map2(
-          integer(6),
-          fn(i, cs) {
-            let tuple(before, rest) = list.split(ls, i + 1)
-            let tuple(elem, after) = list.split(rest, 1)
-            case cs {
-              0 -> list.flatten([elem, before, after])
-              1 -> list.flatten([elem, after, before])
-              2 -> list.flatten([before, elem, after])
-              3 -> list.flatten([before, after, elem])
-              4 -> list.flatten([after, elem, before])
-              5 -> list.flatten([after, before, elem])
-            }
-          },
-        )
-    }
-  }
-
-  let fun = fn(ls) {
-    let init_acc = always(ls)
-    list.fold(ls, init_acc, fn(_, acc) { then(acc, move_to_edge) })
-  }
-
-  then(gen, fun)
 }
