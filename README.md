@@ -1,6 +1,6 @@
 # minigen
 
-A library for generating data in the Erlang ecosystem, written in Gleam.
+A library for generating random data in the Erlang ecosystem, written in Gleam.
 
 ## Installation
 
