@@ -4,7 +4,7 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 
 ## Installation
 
-* For Erlang ang Gleam projects, this package can be installed by adding it to our `rebar.config` dependencies:
+* For Erlang and Gleam projects, this package can be installed by adding it to our `rebar.config` dependencies:
 
 ```erlang
 {deps, [
