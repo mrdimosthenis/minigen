@@ -5,8 +5,7 @@
   {applications,
    [kernel,
     stdlib,
-    gleam_stdlib,
-    gleam_zlists
+    gleam_stdlib
    ]},
   {env,[]},
   {modules, []},

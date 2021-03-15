@@ -3,7 +3,6 @@ import gleam/int
 import gleam/list
 import gleam/string
 import gleam/pair
-import gleam_zlists as zlist
 import minigen/interop
 
 pub type Seed =
@@ -240,26 +239,24 @@ pub fn string(n: Int) -> Generator(String) {
   |> map(fn(graphemes) { list.fold(graphemes, "", string.append) })
 }
 
-pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
-  let Generator(f) = gen
-  let new_f = fn(seed_0) {
-    case n > 0 {
-      True -> {
-        let Ok(res) =
-          zlist.iterate(
-            tuple(seed_0, []),
-            fn(t) {
-              let tuple(seed, ls) = t
-              let tuple(next_seed, elem) = f(seed)
-              let next_ls = list.append([elem], ls)
-              tuple(next_seed, next_ls)
-            },
-          )
-          |> zlist.fetch(n)
-        res
-      }
-      False -> tuple(seed_0, [])
+fn list_help(
+  gen: Generator(a),
+  seed: Seed,
+  ls: List(a),
+  n: Int,
+) -> tuple(Seed, List(a)) {
+  case n < 1 {
+    True -> tuple(seed, ls)
+    False -> {
+      let Generator(f) = gen
+      let tuple(next_seed, value) = f(seed)
+      let next_ls = list.append([value], ls)
+      list_help(gen, next_seed, next_ls, n - 1)
     }
   }
-  Generator(new_f)
+}
+
+pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
+  let f = fn(seed) { list_help(gen, seed, [], n) }
+  Generator(f)
 }
