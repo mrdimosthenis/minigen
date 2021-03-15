@@ -1,3 +1,7 @@
+//// This module contains some useful functions for generating data in the Erlang ecosystem.
+////
+//// For more information see [this website](https://github.com/mrdimosthenis/minigen).
+
 import gleam/float
 import gleam/int
 import gleam/list
@@ -5,9 +9,11 @@ import gleam/string
 import gleam/pair
 import minigen/interop
 
-pub type Seed =
+type Seed =
   interop.State
 
+/// A type for representing generators.
+/// In order for it to generate data, it should be passed as argument to the `run` or `run_with_seed` function.
 pub type Generator(a) {
   Generator(fn(Seed) -> tuple(Seed, a))
 }
@@ -27,6 +33,33 @@ fn uniform(seed: Seed) -> tuple(Seed, Float) {
   tuple(next_seed, x)
 }
 
+/// Creates pseudorandom data for a generator.
+/// If we call this function several times, we will probably get different results.
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:float(),
+/// minigen:run(GEN).
+/// 0.7938520785840248
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.float
+/// |> :minigen.run
+/// 0.36087782004967894
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.float()
+/// |> minigen.run
+/// 0.16296012690374562
+/// ```
+///
 pub fn run(gen: Generator(a)) -> a {
   let Generator(f) = gen
   random_seed()
@@ -34,6 +67,33 @@ pub fn run(gen: Generator(a)) -> a {
   |> pair.second
 }
 
+/// Creates pseudorandom data for a generator but the result depends on the integer seed value.
+/// If we call this function several times with the same seed, we will always get the same results.
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:float(),
+/// minigen:run_with_seed(GEN, 1000).
+/// 0.7109364198110805
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.float
+/// |> :minigen.run_with_seed(999)
+/// 0.4944539429884903
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.float()
+/// |> minigen.run_with_seed(998)
+/// 0.29739016530475904
+/// ```
+///
 pub fn run_with_seed(gen: Generator(a), i: Int) -> a {
   let Generator(f) = gen
   i
@@ -144,6 +204,33 @@ pub fn always(x: a) -> Generator(a) {
   Generator(f)
 }
 
+/// Creates a generatoe for float values.
+/// By running it, we get a random float uniformly distributed between 0.0 (included) and 1.0 (excluded).
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:float(),
+/// minigen:run(GEN).
+/// 0.7938520785840248
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.float
+/// |> :minigen.run
+/// 0.36087782004967894
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.float()
+/// |> minigen.run
+/// 0.16296012690374562
+/// ```
+///
 pub fn float() -> Generator(Float) {
   let f = fn(seed_0) {
     let tuple(seed_1, x) = uniform(seed_0)
@@ -152,6 +239,33 @@ pub fn float() -> Generator(Float) {
   Generator(f)
 }
 
+/// Creates a generator for integer values.
+/// By running it, we get a random integer uniformly distributed between 0 (included) and `n` (excluded).
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:integer(10),
+/// minigen:run(GEN).
+/// 4
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.integer(10)
+/// |> :minigen.run
+/// 8
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.integer(10)
+/// |> minigen.run
+/// 6
+/// ```
+///
 pub fn integer(n: Int) -> Generator(Int) {
   float()
   |> map(fn(x) {
@@ -161,11 +275,82 @@ pub fn integer(n: Int) -> Generator(Int) {
   })
 }
 
+/// Creates a generator for boolean values.
+/// By running it, we get a random boolean value with 50% probability.
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:boolean(),
+/// minigen:run(GEN).
+/// true
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.boolean
+/// |> :minigen.run
+/// false
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.boolean()
+/// |> minigen.run
+/// True
+/// ```
+///
 pub fn boolean() -> Generator(Bool) {
   float()
   |> map(fn(x) { x <. 0.5 })
 }
 
+/// Creates a generator that randomly selects an element from a list.
+/// If the list is empty, then we will get an error.
+///
+///  #### Erlang examples
+///
+/// ```erlang
+/// GEN=minigen:element_of_list([1, 2, 3]),
+/// minigen:run(GEN).
+/// {ok,2}
+/// ```
+///
+/// ```erlang
+/// GEN=minigen:element_of_list([]),
+/// minigen:run(GEN).
+/// {error,nil}
+/// ```
+///
+///  #### Elixir examples
+///
+/// ```elixir
+/// :minigen.element_of_list(["a", "b", "c", "d"])
+/// |> :minigen.run
+/// {:ok, "c"}
+/// ```
+///
+/// ```elixir
+/// :minigen.element_of_list([])
+/// |> :minigen.run
+/// {:error, nil}
+/// ```
+///  #### Gleam examples
+///
+/// ```rust
+/// minigen.element_of_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+/// |> minigen.run
+/// Ok(0.7109364198110805)
+/// ```
+///
+/// ```rust
+/// minigen.element_of_list([])
+/// |> minigen.run
+/// Error(Nil)
+/// ```
+///
 pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
   ls
   |> list.length
@@ -173,6 +358,32 @@ pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
   |> map(fn(n) { list.at(ls, n) })
 }
 
+/// Creates a generator that changes the order of the elements in a list.
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:shuffled_list([1, 2, 3]),
+/// minigen:run(GEN).
+/// [2,1,3]
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.shuffled_list(["a", "b", "c", "d"])
+/// |> :minigen.run
+/// ["c", "d", "b", "a"]
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.shuffled_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+/// |> minigen.run
+/// [0.47372875562526207, 0.5348931595479329, 0.7109364198110805]
+/// ```
+///
 pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
   let move_to_edge = fn(acc_ls) {
     case acc_ls {
@@ -220,6 +431,33 @@ fn upper_graphemes() -> List(String) {
   ]
 }
 
+/// Creates a generator for string values.
+/// The generated string will contain `n` alphanumerics.
+///
+///  #### Erlang example
+///
+/// ```erlang
+/// GEN=minigen:string(6),
+/// minigen:run(GEN).
+/// "3Rzpqd"
+/// ```
+///
+///  #### Elixir example
+///
+/// ```elixir
+/// :minigen.string(7)
+/// |> :minigen.run
+/// "eJKp8sc"
+/// ```
+///
+///  #### Gleam example
+///
+/// ```rust
+/// minigen.string(8)
+/// |> minigen.run
+/// "U3j641WL"
+/// ```
+///
 pub fn string(n: Int) -> Generator(String) {
   3
   |> integer
