@@ -1,6 +1,7 @@
 import gleam/float
 import gleam/int
 import gleam/list
+import gleam/string
 import gleam/pair
 import gleam_zlists as zlist
 import minigen/interop
@@ -200,6 +201,43 @@ pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
   }
 
   list.fold(ls, always(ls), fn(_, acc) { then(acc, move_to_edge) })
+}
+
+fn number_graphemes() -> List(String) {
+  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+}
+
+fn lower_graphemes() -> List(String) {
+  [
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+    "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+  ]
+}
+
+fn upper_graphemes() -> List(String) {
+  [
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
+    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+  ]
+}
+
+pub fn string(n: Int) -> Generator(String) {
+  3
+  |> integer
+  |> then(fn(cs) {
+    case cs {
+      0 -> number_graphemes()
+      1 -> lower_graphemes()
+      2 -> upper_graphemes()
+    }
+    |> element_of_list
+  })
+  |> map(fn(grapheme_result) {
+    let Ok(grapheme) = grapheme_result
+    grapheme
+  })
+  |> list(n)
+  |> map(fn(graphemes) { list.fold(graphemes, "", string.append) })
 }
 
 pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {

@@ -214,6 +214,33 @@ pub fn shuffled_list_test() {
   |> should.equal([])
 }
 
+pub fn string_test() {
+  4
+  |> minigen.string
+  |> minigen.run_with_seed(1000)
+  |> should.equal("Mx01")
+
+  5
+  |> minigen.string
+  |> minigen.run_with_seed(1000)
+  |> should.equal("Mx01l")
+
+  5
+  |> minigen.string
+  |> minigen.run_with_seed(999)
+  |> should.equal("euyO3")
+
+  1
+  |> minigen.string
+  |> minigen.run_with_seed(1000)
+  |> should.equal("M")
+
+  0
+  |> minigen.string
+  |> minigen.run_with_seed(1000)
+  |> should.equal("")
+}
+
 pub fn list_test() {
   minigen.boolean()
   |> minigen.list(4)
