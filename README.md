@@ -28,7 +28,7 @@ The examples below use the `run` function that will probably return different va
 If we want to get the same values on each call, we need to use `run_with_seed` instead.
 
 Don't forget to visit https://hexdocs.pm/minigen/minigen/ to see the signature of the available functions:
-`list`, `then`, `map`, `map2`, `map3`, `map4`, `map5`. Their combination can generate values for any data type.
+`list`, `then`, `sequence`, `map`, `map2`, `map3`, `map4`, `map5`. Their combination can generate values for any data type.
 
 More examples can be found in the test directory of the GitHub repository.
 
