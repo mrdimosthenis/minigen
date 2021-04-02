@@ -1,4 +1,5 @@
 import minigen
+import gleam/list
 import gleam/should
 
 pub fn always_test() {
@@ -269,6 +270,60 @@ pub fn list_test() {
 
   minigen.integer(5)
   |> minigen.list(1)
+  |> minigen.run_with_seed(1000)
+  |> should.equal([3])
+}
+
+pub fn sequence_test() {
+  [
+    minigen.integer(1),
+    minigen.integer(2),
+    minigen.integer(3),
+    minigen.integer(4),
+    minigen.integer(5),
+    minigen.integer(6),
+    minigen.integer(7),
+    minigen.integer(8),
+    minigen.integer(9),
+    minigen.integer(10),
+    minigen.integer(11),
+    minigen.integer(12),
+  ]
+  |> minigen.sequence
+  |> minigen.run_with_seed(1000)
+  |> should.equal([0, 0, 1, 3, 1, 0, 0, 0, 4, 4, 5, 9])
+
+  minigen.boolean()
+  |> list.repeat(4)
+  |> minigen.sequence
+  |> minigen.run_with_seed(1000)
+  |> should.equal([False, True, False, False])
+
+  minigen.float()
+  |> list.repeat(3)
+  |> minigen.sequence
+  |> minigen.run_with_seed(1000)
+  |> should.equal([0.7109364198110805, 0.47372875562526207, 0.5348931595479329])
+
+  minigen.integer(10)
+  |> list.repeat(5)
+  |> minigen.sequence
+  |> minigen.run_with_seed(1000)
+  |> should.equal([7, 4, 5, 9, 2])
+
+  minigen.integer(10)
+  |> list.repeat(5)
+  |> minigen.sequence
+  |> minigen.run_with_seed(999)
+  |> should.equal([4, 1, 3, 7, 5])
+
+  []
+  |> minigen.sequence
+  |> minigen.run_with_seed(1000)
+  |> should.equal([])
+
+  [minigen.integer(5)]
+  |> minigen.sequence
   |> minigen.run_with_seed(1000)
   |> should.equal([3])
 }

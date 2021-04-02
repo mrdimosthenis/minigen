@@ -498,3 +498,19 @@ pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
   let f = fn(seed) { list_help(gen, seed, [], n) }
   Generator(f)
 }
+
+pub fn sequence(gens: List(Generator(a))) -> Generator(List(a)) {
+  list.fold(
+    gens,
+    always([]),
+    fn(next_gen, acc_gen) {
+      then(
+        acc_gen,
+        fn(acc_ls) {
+          map(next_gen, fn(next_head) { list.append([next_head], acc_ls) })
+        },
+      )
+    },
+  )
+  |> map(list.reverse)
+}
