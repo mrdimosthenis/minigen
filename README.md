@@ -8,7 +8,7 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 
 ```erlang
 {deps, [
-    {minigen, "0.0.1"}
+    {minigen, "0.0.2"}
 ]}.
 ```
 
@@ -17,7 +17,7 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 ```elixir
 defp deps do
   [
-    {:minigen, "~> 0.0.1"}
+    {:minigen, "~> 0.0.2"}
   ]
 end
 ```
