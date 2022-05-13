@@ -4,23 +4,25 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 
 ## Installation
 
-* For Erlang and Gleam projects, this package can be installed by adding it to our `rebar.config` dependencies:
+* For **Erlang** projects, add the dependency into `rebar.config`:
 
 ```erlang
 {deps, [
-    {minigen, "0.0.2"}
+    {minigen, "0.0.3"}
 ]}.
 ```
 
-* For Elixir projects, this package can be installed by adding it to our `mix.exs` dependencies:
+* For **Elixir** projects, add the dependency into `mix.exs`:
 
 ```elixir
 defp deps do
   [
-    {:minigen, "~> 0.0.2"}
+    {:minigen, "~> 0.0.3"}
   ]
 end
 ```
+
+* For **Gleam** projects, run `gleam add minigen`.
 
 ## Usage
 
@@ -146,13 +148,13 @@ false
 
 ### Gleam examples
 
-```rust
+```gleam
 import minigen
 ```
 
 * Create a random float number
 
-```rust
+```gleam
 minigen.float()
 |> minigen.run
 0.16296012690374562
@@ -160,7 +162,7 @@ minigen.float()
 
 * Create a random integer number
 
-```rust
+```gleam
 minigen.integer(10)
 |> minigen.run
 6
@@ -168,7 +170,7 @@ minigen.integer(10)
 
 * Create a random boolean value
 
-```rust
+```gleam
 minigen.boolean()
 |> minigen.run
 True
@@ -176,13 +178,13 @@ True
 
 * Get a random element from a list
 
-```rust
+```gleam
 minigen.element_of_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
 |> minigen.run
 Ok(0.7109364198110805)
 ```
 
-```rust
+```gleam
 minigen.element_of_list([])
 |> minigen.run
 Error(Nil)
@@ -190,7 +192,7 @@ Error(Nil)
 
 * Shuffle a list
 
-```rust
+```gleam
 minigen.shuffled_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
 |> minigen.run
 [0.47372875562526207, 0.5348931595479329, 0.7109364198110805]
@@ -198,7 +200,7 @@ minigen.shuffled_list([0.5348931595479329, 0.47372875562526207, 0.71093641981108
 
 * Create a random string
 
-```rust
+```gleam
 minigen.string(8)
 |> minigen.run
 "U3j641WL"

@@ -1,5 +1,5 @@
 name = "minigen"
-version = "0.0.2"
+version = "0.0.3"
 
 [docs]
 links = [
@@ -10,3 +10,9 @@ links = [
 type = "github"
 user = "mrdimosthenis"
 repo = "minigen"
+
+[dependencies]
+gleam_stdlib = "~> 0.21"
+
+[dev-dependencies]
+gleeunit = "~> 0.6"

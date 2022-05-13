@@ -1,4 +1,4 @@
--module(rand_native).
+-module(native_rand_mimigen).
 
 -export([default_algorithm/0]).
 

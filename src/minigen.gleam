@@ -7,6 +7,7 @@ import gleam/int
 import gleam/list
 import gleam/string
 import gleam/pair
+import gleam/result
 import minigen/interop
 
 type Seed =
@@ -15,7 +16,7 @@ type Seed =
 /// A type for representing generators.
 /// In order for it to generate data, it should be passed as argument to the `run` or `run_with_seed` function.
 pub type Generator(a) {
-  Generator(fn(Seed) -> tuple(Seed, a))
+  Generator(fn(Seed) -> #(Seed, a))
 }
 
 fn random_seed() -> Seed {
@@ -28,9 +29,9 @@ fn fixed_seed(i: Int) -> Seed {
   |> interop.seed(i)
 }
 
-fn uniform(seed: Seed) -> tuple(Seed, Float) {
-  let tuple(x, next_seed) = interop.uniform_s(seed)
-  tuple(next_seed, x)
+fn uniform(seed: Seed) -> #(Seed, Float) {
+  let #(x, next_seed) = interop.uniform_s(seed)
+  #(next_seed, x)
 }
 
 /// Creates pseudorandom data for a generator.
@@ -54,7 +55,7 @@ fn uniform(seed: Seed) -> tuple(Seed, Float) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.float()
 /// |> minigen.run
 /// 0.16296012690374562
@@ -88,7 +89,7 @@ pub fn run(gen: Generator(a)) -> a {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.float()
 /// |> minigen.run_with_seed(998)
 /// 0.29739016530475904
@@ -105,8 +106,8 @@ pub fn run_with_seed(gen: Generator(a), i: Int) -> a {
 pub fn map(gen: Generator(a), fun: fn(a) -> b) -> Generator(b) {
   let Generator(f) = gen
   let new_f = fn(seed_0) {
-    let tuple(seed_1, a) = f(seed_0)
-    tuple(seed_1, fun(a))
+    let #(seed_1, a) = f(seed_0)
+    #(seed_1, fun(a))
   }
   Generator(new_f)
 }
@@ -119,9 +120,9 @@ pub fn map2(
   let Generator(f_a) = gen_a
   let Generator(f_b) = gen_b
   let f = fn(seed_0) {
-    let tuple(seed_1, a) = f_a(seed_0)
-    let tuple(seed_2, b) = f_b(seed_1)
-    tuple(seed_2, fun(a, b))
+    let #(seed_1, a) = f_a(seed_0)
+    let #(seed_2, b) = f_b(seed_1)
+    #(seed_2, fun(a, b))
   }
   Generator(f)
 }
@@ -136,10 +137,10 @@ pub fn map3(
   let Generator(f_b) = gen_b
   let Generator(f_c) = gen_c
   let f = fn(seed_0) {
-    let tuple(seed_1, a) = f_a(seed_0)
-    let tuple(seed_2, b) = f_b(seed_1)
-    let tuple(seed_3, c) = f_c(seed_2)
-    tuple(seed_3, fun(a, b, c))
+    let #(seed_1, a) = f_a(seed_0)
+    let #(seed_2, b) = f_b(seed_1)
+    let #(seed_3, c) = f_c(seed_2)
+    #(seed_3, fun(a, b, c))
   }
   Generator(f)
 }
@@ -156,11 +157,11 @@ pub fn map4(
   let Generator(f_c) = gen_c
   let Generator(f_d) = gen_d
   let f = fn(seed_0) {
-    let tuple(seed_1, a) = f_a(seed_0)
-    let tuple(seed_2, b) = f_b(seed_1)
-    let tuple(seed_3, c) = f_c(seed_2)
-    let tuple(seed_4, d) = f_d(seed_3)
-    tuple(seed_4, fun(a, b, c, d))
+    let #(seed_1, a) = f_a(seed_0)
+    let #(seed_2, b) = f_b(seed_1)
+    let #(seed_3, c) = f_c(seed_2)
+    let #(seed_4, d) = f_d(seed_3)
+    #(seed_4, fun(a, b, c, d))
   }
   Generator(f)
 }
@@ -179,12 +180,12 @@ pub fn map5(
   let Generator(f_d) = gen_d
   let Generator(f_e) = gen_e
   let f = fn(seed_0) {
-    let tuple(seed_1, a) = f_a(seed_0)
-    let tuple(seed_2, b) = f_b(seed_1)
-    let tuple(seed_3, c) = f_c(seed_2)
-    let tuple(seed_4, d) = f_d(seed_3)
-    let tuple(seed_5, e) = f_e(seed_4)
-    tuple(seed_5, fun(a, b, c, d, e))
+    let #(seed_1, a) = f_a(seed_0)
+    let #(seed_2, b) = f_b(seed_1)
+    let #(seed_3, c) = f_c(seed_2)
+    let #(seed_4, d) = f_d(seed_3)
+    let #(seed_5, e) = f_e(seed_4)
+    #(seed_5, fun(a, b, c, d, e))
   }
   Generator(f)
 }
@@ -192,7 +193,7 @@ pub fn map5(
 pub fn then(gen: Generator(a), fun: fn(a) -> Generator(b)) -> Generator(b) {
   let Generator(f) = gen
   let new_f = fn(seed_0) {
-    let tuple(seed_1, a) = f(seed_0)
+    let #(seed_1, a) = f(seed_0)
     let Generator(g) = fun(a)
     g(seed_1)
   }
@@ -200,7 +201,7 @@ pub fn then(gen: Generator(a), fun: fn(a) -> Generator(b)) -> Generator(b) {
 }
 
 pub fn always(x: a) -> Generator(a) {
-  let f = fn(seed) { tuple(seed, x) }
+  let f = fn(seed) { #(seed, x) }
   Generator(f)
 }
 
@@ -225,7 +226,7 @@ pub fn always(x: a) -> Generator(a) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.float()
 /// |> minigen.run
 /// 0.16296012690374562
@@ -233,8 +234,8 @@ pub fn always(x: a) -> Generator(a) {
 ///
 pub fn float() -> Generator(Float) {
   let f = fn(seed_0) {
-    let tuple(seed_1, x) = uniform(seed_0)
-    tuple(seed_1, x)
+    let #(seed_1, x) = uniform(seed_0)
+    #(seed_1, x)
   }
   Generator(f)
 }
@@ -260,7 +261,7 @@ pub fn float() -> Generator(Float) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.integer(10)
 /// |> minigen.run
 /// 6
@@ -296,7 +297,7 @@ pub fn integer(n: Int) -> Generator(Int) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.boolean()
 /// |> minigen.run
 /// True
@@ -339,13 +340,13 @@ pub fn boolean() -> Generator(Bool) {
 /// ```
 ///  #### Gleam examples
 ///
-/// ```rust
+/// ```gleam
 /// minigen.element_of_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
 /// |> minigen.run
 /// Ok(0.7109364198110805)
 /// ```
 ///
-/// ```rust
+/// ```gleam
 /// minigen.element_of_list([])
 /// |> minigen.run
 /// Error(Nil)
@@ -378,7 +379,7 @@ pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.shuffled_list([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
 /// |> minigen.run
 /// [0.47372875562526207, 0.5348931595479329, 0.7109364198110805]
@@ -395,8 +396,8 @@ pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
         |> map2(
           integer(6),
           fn(i, cs) {
-            let tuple(before, rest) = list.split(acc_ls, i + 1)
-            let tuple(elem, after) = list.split(rest, 1)
+            let #(before, rest) = list.split(acc_ls, i + 1)
+            let #(elem, after) = list.split(rest, 1)
             case cs {
               0 -> list.flatten([elem, before, after])
               1 -> list.flatten([elem, after, before])
@@ -410,7 +411,7 @@ pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
     }
   }
 
-  list.fold(ls, always(ls), fn(_, acc) { then(acc, move_to_edge) })
+  list.fold(ls, always(ls), fn(acc, _) { then(acc, move_to_edge) })
 }
 
 fn number_graphemes() -> List(String) {
@@ -452,7 +453,7 @@ fn upper_graphemes() -> List(String) {
 ///
 ///  #### Gleam example
 ///
-/// ```rust
+/// ```gleam
 /// minigen.string(8)
 /// |> minigen.run
 /// "U3j641WL"
@@ -469,12 +470,10 @@ pub fn string(n: Int) -> Generator(String) {
     }
     |> element_of_list
   })
-  |> map(fn(grapheme_result) {
-    let Ok(grapheme) = grapheme_result
-    grapheme
-  })
+  |> map(result.unwrap(_, ""))
   |> list(n)
-  |> map(fn(graphemes) { list.fold(graphemes, "", string.append) })
+  |> map(list.reverse)
+  |> map(list.fold(_, "", string.append))
 }
 
 fn list_help(
@@ -482,12 +481,12 @@ fn list_help(
   seed: Seed,
   ls: List(a),
   n: Int,
-) -> tuple(Seed, List(a)) {
+) -> #(Seed, List(a)) {
   case n < 1 {
-    True -> tuple(seed, ls)
+    True -> #(seed, ls)
     False -> {
       let Generator(f) = gen
-      let tuple(next_seed, value) = f(seed)
+      let #(next_seed, value) = f(seed)
       let next_ls = list.append([value], ls)
       list_help(gen, next_seed, next_ls, n - 1)
     }
@@ -503,7 +502,7 @@ pub fn sequence(gens: List(Generator(a))) -> Generator(List(a)) {
   list.fold(
     gens,
     always([]),
-    fn(next_gen, acc_gen) {
+    fn(acc_gen, next_gen) {
       then(
         acc_gen,
         fn(acc_ls) {
