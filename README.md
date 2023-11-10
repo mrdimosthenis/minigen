@@ -1,6 +1,6 @@
 # minigen
 
-A library for generating random data in the Erlang ecosystem, written in Gleam.
+Pure random data generation library, appropriate for realistic simulations in the Erlang ecosystem.
 
 ## Installation
 
@@ -8,7 +8,7 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 
 ```erlang
 {deps, [
-    {minigen, "0.0.3"}
+    {minigen, "0.1.0"}
 ]}.
 ```
 
@@ -17,7 +17,7 @@ A library for generating random data in the Erlang ecosystem, written in Gleam.
 ```elixir
 defp deps do
   [
-    {:minigen, "~> 0.0.3"}
+    {:minigen, "~> 0.1.0", manager: :rebar3}
   ]
 end
 ```

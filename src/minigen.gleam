@@ -5,9 +5,8 @@
 import gleam/float
 import gleam/int
 import gleam/list
-import gleam/string
 import gleam/pair
-import gleam/result
+import gleam/string
 import minigen/interop
 
 type Seed =
@@ -205,7 +204,7 @@ pub fn always(x: a) -> Generator(a) {
   Generator(f)
 }
 
-/// Creates a generatoe for float values.
+/// Creates a generator for float values.
 /// By running it, we get a random float uniformly distributed between 0.0 (included) and 1.0 (excluded).
 ///
 ///  #### Erlang example
@@ -268,12 +267,10 @@ pub fn float() -> Generator(Float) {
 /// ```
 ///
 pub fn integer(n: Int) -> Generator(Int) {
-  float()
-  |> map(fn(x) {
-    x *. int.to_float(n)
-    |> float.floor
-    |> float.round
-  })
+  use x <- map(float())
+  x *. int.to_float(n)
+  |> float.floor
+  |> float.round
 }
 
 /// Creates a generator for boolean values.
@@ -304,8 +301,8 @@ pub fn integer(n: Int) -> Generator(Int) {
 /// ```
 ///
 pub fn boolean() -> Generator(Bool) {
-  float()
-  |> map(fn(x) { x <. 0.5 })
+  use x <- map(float())
+  x <. 0.5
 }
 
 /// Creates a generator that randomly selects an element from a list.
@@ -356,7 +353,7 @@ pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
   ls
   |> list.length
   |> integer
-  |> map(fn(n) { list.at(ls, n) })
+  |> map(list.at(ls, _))
 }
 
 /// Creates a generator that changes the order of the elements in a list.
@@ -386,49 +383,36 @@ pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
 /// ```
 ///
 pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
-  let move_to_edge = fn(acc_ls) {
-    case acc_ls {
-      [] -> always([])
-      [x] -> always([x])
-      _ ->
-        list.length(acc_ls) - 1
-        |> integer
-        |> map2(
-          integer(6),
-          fn(i, cs) {
-            let #(before, rest) = list.split(acc_ls, i + 1)
-            let #(elem, after) = list.split(rest, 1)
-            case cs {
-              0 -> list.flatten([elem, before, after])
-              1 -> list.flatten([elem, after, before])
-              2 -> list.flatten([before, elem, after])
-              3 -> list.flatten([before, after, elem])
-              4 -> list.flatten([after, elem, before])
-              5 -> list.flatten([after, before, elem])
-            }
-          },
-        )
+  case ls {
+    [] -> always([])
+    _ -> {
+      let gen =
+        ls
+        |> list.length
+        |> list.range(1)
+        |> list.map(integer)
+        |> sequence
+      {
+        use indexes <- map(gen)
+        use acc, i <- list.fold(indexes, #([], ls))
+        let #(selected_elems, rest_elems) = acc
+        let #(before, [chosen, ..after]) = list.split(rest_elems, i)
+        let next_selected_elems = list.prepend(selected_elems, chosen)
+        let next_rest_elems = list.append(before, after)
+        #(next_selected_elems, next_rest_elems)
+      }
+      |> map(pair.first)
     }
   }
-
-  list.fold(ls, always(ls), fn(acc, _) { then(acc, move_to_edge) })
 }
 
-fn number_graphemes() -> List(String) {
-  ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-}
-
-fn lower_graphemes() -> List(String) {
+fn graphemes() -> List(String) {
   [
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
-    "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-  ]
-}
-
-fn upper_graphemes() -> List(String) {
-  [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P",
-    "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+    "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D",
+    "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S",
+    "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7",
+    "8", "9",
   ]
 }
 
@@ -460,56 +444,45 @@ fn upper_graphemes() -> List(String) {
 /// ```
 ///
 pub fn string(n: Int) -> Generator(String) {
-  3
-  |> integer
-  |> then(fn(cs) {
-    case cs {
-      0 -> number_graphemes()
-      1 -> lower_graphemes()
-      2 -> upper_graphemes()
-    }
-    |> element_of_list
+  graphemes()
+  |> element_of_list
+  |> map(fn(r) {
+    let assert Ok(c) = r
+    c
   })
-  |> map(result.unwrap(_, ""))
   |> list(n)
   |> map(list.reverse)
-  |> map(list.fold(_, "", string.append))
+  |> map(string.join(_, ""))
 }
 
-fn list_help(
+fn list_go(
   gen: Generator(a),
   seed: Seed,
   ls: List(a),
   n: Int,
 ) -> #(Seed, List(a)) {
-  case n < 1 {
-    True -> #(seed, ls)
-    False -> {
+  case n {
+    0 -> #(seed, ls)
+    _ -> {
       let Generator(f) = gen
       let #(next_seed, value) = f(seed)
-      let next_ls = list.append([value], ls)
-      list_help(gen, next_seed, next_ls, n - 1)
+      let next_ls = list.prepend(ls, value)
+      list_go(gen, next_seed, next_ls, n - 1)
     }
   }
 }
 
 pub fn list(gen: Generator(a), n: Int) -> Generator(List(a)) {
-  let f = fn(seed) { list_help(gen, seed, [], n) }
+  let f = fn(seed) { list_go(gen, seed, [], n) }
   Generator(f)
 }
 
 pub fn sequence(gens: List(Generator(a))) -> Generator(List(a)) {
-  list.fold(
-    gens,
-    always([]),
-    fn(acc_gen, next_gen) {
-      then(
-        acc_gen,
-        fn(acc_ls) {
-          map(next_gen, fn(next_head) { list.append([next_head], acc_ls) })
-        },
-      )
-    },
-  )
+  {
+    use acc_gen, next_gen <- list.fold(gens, always([]))
+    use acc_ls <- then(acc_gen)
+    use next_head <- map(next_gen)
+    list.prepend(acc_ls, next_head)
+  }
   |> map(list.reverse)
 }

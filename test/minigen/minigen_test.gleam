@@ -19,11 +19,11 @@ pub fn always_test() {
 pub fn float_test() {
   minigen.float()
   |> minigen.run_with_seed(1000)
-  |> should.equal(0.7109364198110805)
+  |> should.equal(0.27586903946041397)
 
   minigen.float()
   |> minigen.run_with_seed(999)
-  |> should.equal(0.4944539429884903)
+  |> should.equal(0.14229440857120912)
 
   let random_float =
     minigen.float()
@@ -37,11 +37,11 @@ pub fn float_test() {
 pub fn integer_test() {
   minigen.integer(10)
   |> minigen.run_with_seed(1000)
-  |> should.equal(7)
+  |> should.equal(2)
 
   minigen.integer(10)
   |> minigen.run_with_seed(999)
-  |> should.equal(4)
+  |> should.equal(1)
 
   let random_integer =
     minigen.integer(5)
@@ -55,33 +55,33 @@ pub fn integer_test() {
 pub fn boolean_test() {
   minigen.boolean()
   |> minigen.run_with_seed(1000)
-  |> should.equal(False)
+  |> should.equal(True)
 
   minigen.boolean()
-  |> minigen.run_with_seed(999)
-  |> should.equal(True)
+  |> minigen.run_with_seed(1001)
+  |> should.equal(False)
 }
 
 pub fn element_of_list_test() {
   [False, False, True, False]
   |> minigen.element_of_list
   |> minigen.run_with_seed(1000)
-  |> should.equal(Ok(True))
+  |> should.equal(Ok(False))
 
-  [0.5348931595479329, 0.47372875562526207, 0.7109364198110805]
+  [0.5348931595479329, 0.1952355138836377, 0.27586903946041397]
   |> minigen.element_of_list
   |> minigen.run_with_seed(1000)
-  |> should.equal(Ok(0.7109364198110805))
+  |> should.equal(Ok(0.5348931595479329))
 
   [2, 9, 5, 4, 7]
   |> minigen.element_of_list
   |> minigen.run_with_seed(1000)
-  |> should.equal(Ok(4))
+  |> should.equal(Ok(9))
 
   [2, 9, 5, 4, 7]
   |> minigen.element_of_list
   |> minigen.run_with_seed(999)
-  |> should.equal(Ok(5))
+  |> should.equal(Ok(2))
 
   [6]
   |> minigen.element_of_list
@@ -108,63 +108,63 @@ pub fn shuffled_list_test() {
   [False, False, True, False]
   |> minigen.shuffled_list
   |> minigen.run_with_seed(1000)
-  |> should.equal([False, False, False, True])
+  |> should.equal([True, False, False, False])
 
-  [0.5348931595479329, 0.47372875562526207, 0.7109364198110805]
+  [0.5348931595479329, 0.1952355138836377, 0.27586903946041397]
   |> minigen.shuffled_list
   |> minigen.run_with_seed(1000)
-  |> should.equal([0.47372875562526207, 0.5348931595479329, 0.7109364198110805])
+  |> should.equal([0.27586903946041397, 0.1952355138836377, 0.5348931595479329])
 
   [2, 9, 5, 4, 7]
   |> minigen.shuffled_list
   |> minigen.run_with_seed(1000)
-  |> should.equal([7, 2, 9, 5, 4])
+  |> should.equal([4, 5, 7, 2, 9])
 
   [2, 9, 5, 4, 7]
   |> minigen.shuffled_list
   |> minigen.run_with_seed(999)
-  |> should.equal([2, 4, 7, 9, 5])
+  |> should.equal([5, 7, 4, 9, 2])
 
   [2, 9, 5, 4, 7]
   |> minigen.shuffled_list
   |> minigen.run_with_seed(998)
-  |> should.equal([4, 7, 5, 9, 2])
+  |> should.equal([4, 9, 2, 7, 5])
 
   [1, 2, 3]
   |> minigen.shuffled_list
   |> minigen.list(30)
   |> minigen.run_with_seed(1000)
   |> should.equal([
-    [1, 2, 3],
-    [1, 2, 3],
-    [3, 1, 2],
     [2, 3, 1],
-    [1, 3, 2],
-    [3, 1, 2],
-    [3, 1, 2],
-    [3, 1, 2],
-    [3, 2, 1],
-    [3, 2, 1],
-    [1, 2, 3],
     [2, 1, 3],
-    [3, 1, 2],
     [2, 1, 3],
-    [2, 3, 1],
-    [2, 3, 1],
+    [2, 1, 3],
     [1, 2, 3],
     [1, 3, 2],
-    [2, 3, 1],
-    [1, 2, 3],
-    [3, 2, 1],
-    [1, 3, 2],
-    [1, 3, 2],
-    [1, 3, 2],
-    [1, 3, 2],
-    [1, 2, 3],
-    [3, 2, 1],
     [2, 1, 3],
     [3, 2, 1],
+    [1, 2, 3],
+    [1, 3, 2],
+    [3, 1, 2],
+    [3, 1, 2],
     [2, 1, 3],
+    [3, 1, 2],
+    [3, 2, 1],
+    [1, 3, 2],
+    [2, 3, 1],
+    [3, 2, 1],
+    [1, 2, 3],
+    [3, 2, 1],
+    [1, 2, 3],
+    [1, 2, 3],
+    [3, 1, 2],
+    [3, 2, 1],
+    [1, 3, 2],
+    [1, 3, 2],
+    [2, 1, 3],
+    [1, 2, 3],
+    [3, 2, 1],
+    [3, 2, 1],
   ])
 
   [False, True]
@@ -173,6 +173,8 @@ pub fn shuffled_list_test() {
   |> minigen.run_with_seed(1000)
   |> should.equal([
     [False, True],
+    [True, False],
+    [False, True],
     [False, True],
     [True, False],
     [False, True],
@@ -180,18 +182,16 @@ pub fn shuffled_list_test() {
     [False, True],
     [True, False],
     [False, True],
-    [False, True],
-    [False, True],
-    [False, True],
     [True, False],
+    [False, True],
     [False, True],
     [True, False],
     [True, False],
     [True, False],
-    [True, False],
+    [False, True],
     [True, False],
     [False, True],
-    [False, True],
+    [True, False],
   ])
 
   [6]
@@ -219,22 +219,22 @@ pub fn string_test() {
   4
   |> minigen.string
   |> minigen.run_with_seed(1000)
-  |> should.equal("Mx01")
+  |> should.equal("rmPg")
 
   5
   |> minigen.string
   |> minigen.run_with_seed(1000)
-  |> should.equal("Mx01l")
+  |> should.equal("rmPgD")
 
   5
   |> minigen.string
   |> minigen.run_with_seed(999)
-  |> should.equal("euyO3")
+  |> should.equal("ikD7Q")
 
   1
   |> minigen.string
   |> minigen.run_with_seed(1000)
-  |> should.equal("M")
+  |> should.equal("r")
 
   0
   |> minigen.string
@@ -246,22 +246,22 @@ pub fn list_test() {
   minigen.boolean()
   |> minigen.list(4)
   |> minigen.run_with_seed(1000)
-  |> should.equal([False, False, True, False])
+  |> should.equal([True, False, True, True])
 
   minigen.float()
   |> minigen.list(3)
   |> minigen.run_with_seed(1000)
-  |> should.equal([0.5348931595479329, 0.47372875562526207, 0.7109364198110805])
+  |> should.equal([0.6724156678264623, 0.1952355138836377, 0.27586903946041397])
 
   minigen.integer(10)
   |> minigen.list(5)
   |> minigen.run_with_seed(1000)
-  |> should.equal([2, 9, 5, 4, 7])
+  |> should.equal([4, 1, 6, 1, 2])
 
   minigen.integer(10)
   |> minigen.list(5)
   |> minigen.run_with_seed(999)
-  |> should.equal([5, 7, 3, 1, 4])
+  |> should.equal([6, 9, 4, 1, 1])
 
   minigen.integer(5)
   |> minigen.list(0)
@@ -271,7 +271,7 @@ pub fn list_test() {
   minigen.integer(5)
   |> minigen.list(1)
   |> minigen.run_with_seed(1000)
-  |> should.equal([3])
+  |> should.equal([1])
 }
 
 pub fn sequence_test() {
@@ -291,31 +291,31 @@ pub fn sequence_test() {
   ]
   |> minigen.sequence
   |> minigen.run_with_seed(1000)
-  |> should.equal([0, 0, 1, 3, 1, 0, 0, 0, 4, 4, 5, 9])
+  |> should.equal([0, 0, 2, 0, 2, 2, 6, 5, 2, 8, 4, 0])
 
   minigen.boolean()
   |> list.repeat(4)
   |> minigen.sequence
   |> minigen.run_with_seed(1000)
-  |> should.equal([False, True, False, False])
+  |> should.equal([True, True, False, True])
 
   minigen.float()
   |> list.repeat(3)
   |> minigen.sequence
   |> minigen.run_with_seed(1000)
-  |> should.equal([0.7109364198110805, 0.47372875562526207, 0.5348931595479329])
+  |> should.equal([0.27586903946041397, 0.1952355138836377, 0.6724156678264623])
 
   minigen.integer(10)
   |> list.repeat(5)
   |> minigen.sequence
   |> minigen.run_with_seed(1000)
-  |> should.equal([7, 4, 5, 9, 2])
+  |> should.equal([2, 1, 6, 1, 4])
 
   minigen.integer(10)
   |> list.repeat(5)
   |> minigen.sequence
   |> minigen.run_with_seed(999)
-  |> should.equal([4, 1, 3, 7, 5])
+  |> should.equal([1, 1, 4, 9, 6])
 
   []
   |> minigen.sequence
@@ -325,5 +325,5 @@ pub fn sequence_test() {
   [minigen.integer(5)]
   |> minigen.sequence
   |> minigen.run_with_seed(1000)
-  |> should.equal([3])
+  |> should.equal([1])
 }

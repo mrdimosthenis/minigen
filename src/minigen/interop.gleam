@@ -1,15 +1,15 @@
-pub external type Algorithm
+pub type Algorithm
 
-pub external type State
+pub type State
 
-pub external fn default_algorithm() -> Algorithm =
-  "native_rand_mimigen" "default_algorithm"
+@external(erlang, "native_rand_mimigen", "default_algorithm")
+pub fn default_algorithm() -> Algorithm
 
-pub external fn seed_s(Algorithm) -> State =
-  "rand" "seed_s"
+@external(erlang, "rand", "seed_s")
+pub fn seed_s(algorithm: Algorithm) -> State
 
-pub external fn seed(Algorithm, Int) -> State =
-  "rand" "seed"
+@external(erlang, "rand", "seed")
+pub fn seed(algorithm: Algorithm, int: Int) -> State
 
-pub external fn uniform_s(State) -> #(Float, State) =
-  "rand" "uniform_s"
+@external(erlang, "rand", "uniform_s")
+pub fn uniform_s(state: State) -> #(Float, State)

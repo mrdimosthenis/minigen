@@ -3,4 +3,4 @@
 -export([default_algorithm/0]).
 
 default_algorithm() ->
-    exsss.
+    exs1024s.
