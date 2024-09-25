@@ -1,5 +1,5 @@
-import minigen/interop
 import gleeunit/should
+import minigen/interop
 
 pub fn uniform_s_test() {
   let init_state =
