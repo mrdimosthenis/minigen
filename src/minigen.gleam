@@ -353,7 +353,17 @@ pub fn element_of_list(ls: List(a)) -> Generator(Result(a, Nil)) {
   ls
   |> list.length
   |> integer
-  |> map(list.at(ls, _))
+  |> map(at(ls, _))
+}
+
+fn at(in list: List(a), get index: Int) -> Result(a, Nil) {
+  case index >= 0 {
+    True ->
+      list
+      |> list.drop(index)
+      |> list.first
+    False -> Error(Nil)
+  }
 }
 
 /// Creates a generator that changes the order of the elements in a list.
@@ -396,7 +406,7 @@ pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
         use indexes <- map(gen)
         use acc, i <- list.fold(indexes, #([], ls))
         let #(selected_elems, rest_elems) = acc
-        let #(before, [chosen, ..after]) = list.split(rest_elems, i)
+        let assert #(before, [chosen, ..after]) = list.split(rest_elems, i)
         let next_selected_elems = list.prepend(selected_elems, chosen)
         let next_rest_elems = list.append(before, after)
         #(next_selected_elems, next_rest_elems)
