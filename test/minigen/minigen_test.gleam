@@ -1,6 +1,6 @@
-import minigen
 import gleam/list
 import gleeunit/should
+import minigen
 
 pub fn always_test() {
   minigen.always(5.0)
