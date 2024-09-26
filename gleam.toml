@@ -1,5 +1,5 @@
 name = "minigen"
-version = "0.1.0"
+version = "0.1.1"
 
 description = "Pure random data generation, appropriate for realistic simulations"
 licences = ["Apache-2.0"]

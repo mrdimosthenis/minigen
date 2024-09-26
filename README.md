@@ -8,7 +8,7 @@ Pure random data generation library, appropriate for realistic simulations in th
 
 ```erlang
 {deps, [
-    {minigen, "0.1.0"}
+    {minigen, "0.1.1"}
 ]}.
 ```
 
@@ -17,7 +17,7 @@ Pure random data generation library, appropriate for realistic simulations in th
 ```elixir
 defp deps do
   [
-    {:minigen, "~> 0.1.0", manager: :rebar3}
+    {:minigen, "~> 0.1.1", manager: :rebar3}
   ]
 end
 ```
