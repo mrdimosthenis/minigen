@@ -399,8 +399,11 @@ pub fn shuffled_list(ls: List(a)) -> Generator(List(a)) {
       let gen =
         ls
         |> list.length
-        |> list.range(1)
-        |> list.map(integer)
+        // This processes the range of integers from 1 to the length of the list
+        // but reverses the order in the reducer function thus creating
+        // a list from len to 1
+        |> int.add(1)
+        |> int.range(1, _, [], fn(acc, i) { [integer(i), ..acc] })
         |> sequence
       {
         use indexes <- map(gen)
